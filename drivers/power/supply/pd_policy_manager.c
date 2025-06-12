@@ -2,7 +2,6 @@
 /*
 * Copyright (c) 2022 Southchip Semiconductor Technology(Shanghai) Co., Ltd.
 */
-#define pr_fmt(fmt)	"[SC-USBPD-PM]: %s: " fmt, __func__
 
 #include <linux/slab.h>
 #include <linux/module.h>
