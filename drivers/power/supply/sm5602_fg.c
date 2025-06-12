@@ -13,7 +13,6 @@
  *
  */
 
-#define pr_fmt(fmt)	"[sm5602] %s(%d): " fmt, __func__, __LINE__
 #include <linux/module.h>
 #include <linux/param.h>
 #include <linux/jiffies.h>

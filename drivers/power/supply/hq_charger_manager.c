@@ -1,5 +1,3 @@
-#define pr_fmt(fmt) "batt_chg %s: " fmt, __func__
-
 #include <linux/slab.h>
 #include <linux/module.h>
 #include <linux/kernel.h>
