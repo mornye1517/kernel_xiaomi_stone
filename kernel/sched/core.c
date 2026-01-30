@@ -6027,8 +6027,10 @@ out_put_task:
 	return retval;
 }
 
-char sched_lib_name[LIB_PATH_LENGTH];
-unsigned int sched_lib_mask_force;
+char sched_lib_name[LIB_PATH_LENGTH] =
+{ "UnityMain,libunity.so,com.miHoYo.,com.HoYoverse.,com.gryphline.endfield.gp,libunity.so,libfb.so,liblogic.so,libssgamesdkcronet.so,libil2cpp.so,libmain.so,com.pubg.imobile,com.pubg.,com.activision."
+};
+unsigned int sched_lib_mask_force = 255;
 bool is_sched_lib_based_app(pid_t pid)
 {
 	const char *name = NULL;
