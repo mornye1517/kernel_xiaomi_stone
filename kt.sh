@@ -18,11 +18,11 @@ done
 # Inherit kernelsu next
 curl -LSs "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next/kernel/setup.sh" | bash -s legacy
 
-export KBUILD_BUILD_USER="rizky-maulana-builder"
+export KBUILD_BUILD_USER="mornye"
 export TZ=Asia/Jakarta
-export KBUILD_BUILD_VERSION=1
-export KBUILD_BUILD_TIMESTAMP="Fri Jan  9 10:05:04 WIB 2026"
-export KBUILD_BUILD_HOST="pangu-build-component-system-906899-cv5m1-jpcp4-8wrc6"
+#export KBUILD_BUILD_VERSION=1
+#export KBUILD_BUILD_TIMESTAMP="Fri Jan  9 10:05:04 WIB 2026"
+export KBUILD_BUILD_HOST="build-host"
 export KERNELDIR="$(pwd)"
 export KERNELNAME="Karbit"
 export SRCDIR="${KERNELDIR}"
@@ -31,7 +31,7 @@ export ANYKERNEL="${KERNELDIR}/AnyKernel3"
 export DEFCONFIG="stone_defconfig"
 export ZIP_DIR="${KERNELDIR}/files"
 export IMAGE="${OUTDIR}/arch/arm64/boot/Image"
-export VARI="HyperOS3"
+export VARI="MIUI_Hyper"
 #export DTBO="${OUTDIR}/arch/arm64/boot/dtbo.img"
 export PATH="$(pwd)/clang/bin:$PATH"
 

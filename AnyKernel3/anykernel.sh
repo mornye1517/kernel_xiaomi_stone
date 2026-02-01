@@ -4,7 +4,7 @@
 ## AnyKernel setup
 # begin properties
 properties() { '
-kernel.string=Karbit kernel by RizkyMaulana for HyperOS 3+
+kernel.string=Karbit kernel for MIUI/HyperOS and Legacy AOSP
 do.devicecheck=0
 do.modules=0
 do.systemless=1
