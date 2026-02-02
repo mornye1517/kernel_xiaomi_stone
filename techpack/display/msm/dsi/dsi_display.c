@@ -497,7 +497,7 @@ static void dsi_display_register_te_irq(struct dsi_display *display)
 	irq_set_status_flags(te_irq, IRQ_DISABLE_UNLAZY);
 
 	rc = devm_request_irq(dev, te_irq, dsi_display_panel_te_irq_handler,
-			      IRQF_TRIGGER_FALLING | IRQF_ONESHOT,
+			      IRQF_TRIGGER_FALLING | IRQF_ONESHOT | IRQF_NOBALANCING,
 			      "TE_GPIO", display);
 	if (rc) {
 		DSI_ERR("TE request_irq failed for ESD rc:%d\n", rc);

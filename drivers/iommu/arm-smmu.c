@@ -311,7 +311,7 @@ static void arm_smmu_interrupt_selftest(struct arm_smmu_device *smmu)
 
 		ret = devm_request_threaded_irq(smmu->dev, irq, NULL,
 				arm_smmu_cf_selftest,
-				IRQF_ONESHOT | IRQF_SHARED,
+				IRQF_ONESHOT | IRQF_SHARED | IRQF_NOBALANCING,
 				"arm-smmu-context-fault", cb_data);
 		if (ret < 0) {
 			dev_err(smmu->dev,
