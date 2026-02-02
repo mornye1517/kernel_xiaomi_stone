@@ -1318,7 +1318,7 @@ int dsi_display_set_power(struct drm_connector *connector,
 		drm_notifier_call_chain(DRM_EARLY_EVENT_BLANK, &g_notify_data);
 		if (display->panel->power_mode == SDE_MODE_DPMS_LP2) {
 			if (dsi_display_set_ulp_load(display, false) < 0)
-				DSI_ERR("failed to set load for lp1 state\n");
+				DSI_WARN("failed to set load for lp1 state\n");
 		}
 		rc = dsi_panel_set_lp1(display->panel);
 		drm_notifier_call_chain(DRM_EVENT_BLANK, &g_notify_data);
@@ -1330,14 +1330,14 @@ int dsi_display_set_power(struct drm_connector *connector,
 		usleep_range(20000, 30000);
 		rc = dsi_panel_set_lp2(display->panel);
 		if (dsi_display_set_ulp_load(display, true) < 0)
-			DSI_ERR("failed to set load for lp2 state\n");
+			DSI_WARN("failed to set load for lp2 state\n");
 		drm_notifier_call_chain(DRM_EVENT_BLANK, &g_notify_data);
 		break;
 	case SDE_MODE_DPMS_ON:
 		display->panel->is_aod = false;
 		if (display->panel->power_mode == SDE_MODE_DPMS_LP2) {
 			if (dsi_display_set_ulp_load(display, false) < 0)
-				DSI_ERR("failed to set load for on state\n");
+				DSI_WARN("failed to set load for on state\n");
 		}
 		if ((display->panel->power_mode == SDE_MODE_DPMS_LP1) ||
 		    (display->panel->power_mode == SDE_MODE_DPMS_LP2)) {
