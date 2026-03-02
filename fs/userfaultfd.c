@@ -497,6 +497,16 @@ vm_fault_t handle_userfault(struct vm_fault *vmf, unsigned long reason)
 
 	blocking_state = userfaultfd_get_blocking_state(vmf->flags);
 
+	if (fatal_signal_pending(current) || (current->flags & PF_EXITING)) {
+		ret = VM_FAULT_SIGBUS;
+		goto out;
+	}
+
+	if (unlikely(current->flags & PF_MEMALLOC)) {
+		ret = VM_FAULT_SIGBUS;
+		goto out;
+	}
+
 	spin_lock_irq(&ctx->fault_pending_wqh.lock);
 	/*
 	 * After the __add_wait_queue the uwq is visible to userland
