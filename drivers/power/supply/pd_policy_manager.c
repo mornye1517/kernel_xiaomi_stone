@@ -834,9 +834,12 @@ static int  get_batt_temp_thermal_curr(struct usbpd_pm *pdpm)
 extern int get_usbpd_verifed_state(void);
 static int battery_sw_jeita(struct usbpd_pm *pdpm)
 {
+    bool thermal_boost = thermal_boost_allowed();
+    int thermal_threshold = thermal_boost ? 440 : 400;
     int jeita_curr = 0;
     int pd_auth = 0;
     int cycle_volt = 0;
+    int fast_mode = fast_chg_get_mode();
 
     pd_auth = get_usbpd_verifed_state();
     usbpd_check_batverify(pdpm);
@@ -867,7 +870,6 @@ static int battery_sw_jeita(struct usbpd_pm *pdpm)
             jeita_curr  = CHG_BAT_CURR_2450MA;
 
     	// Apply the power profile limits (30W, 15W, 8W)
-        int fast_mode = fast_chg_get_mode(); 
     	switch (fast_mode) {
     	    case FAST_CHARGE_30W:
         	jeita_curr = min(jeita_curr, 6000);
@@ -896,9 +898,6 @@ static int battery_sw_jeita(struct usbpd_pm *pdpm)
                         pdpm->bat_temp,  jeita_curr, pdpm->therm_curr, pdpm->pps_temp_flag, pd_auth, pdpm->bat_cycle, pdpm->batt_auth);
 
     // Thermal charge bypass
-    bool thermal_boost = thermal_boost_allowed();
-    int thermal_threshold = thermal_boost ? 440 : 400;
-    
     if (pdpm->bat_temp < thermal_threshold) {
         pdpm->therm_curr = jeita_curr;
     }
