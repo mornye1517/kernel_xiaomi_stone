@@ -1301,13 +1301,14 @@ int dsi_display_set_power(struct drm_connector *connector,
 	struct drm_device *dev = NULL;
 	int rc = 0, event = 0;
 
-	if (!display || !display->panel) {
+	if (!connector || !display || !display->panel) {
 		DSI_ERR("invalid display/panel\n");
 		return -EINVAL;
 	} else {
 		dev = connector->dev;
 #ifdef CONFIG_HQ_QGKI
-		event = dev->doze_state;
+		if (dev)
+			event = dev->doze_state;
 #endif
 	}
 
@@ -1345,6 +1346,7 @@ int dsi_display_set_power(struct drm_connector *connector,
 						&g_notify_data);
 			rc = dsi_panel_set_nolp(display->panel);
 			if (!rc) {
+				usleep_range(1000, 2000);
 				dsi_display_set_backlight(connector, display,
 					display->panel->bl_config.bl_level);
 			}
@@ -1354,6 +1356,7 @@ int dsi_display_set_power(struct drm_connector *connector,
 		break;
 	case SDE_MODE_DPMS_OFF:
 		display->panel->is_aod = false;
+		break;
 	default:
 #ifdef CONFIG_HQ_QGKI
 		if (dev->pre_state != SDE_MODE_DPMS_LP1 &&
@@ -1366,14 +1369,17 @@ int dsi_display_set_power(struct drm_connector *connector,
 		return rc;
 	}
 #ifdef CONFIG_HQ_QGKI
-	dev->pre_state = power_mode;
+        if (dev)
+                dev->pre_state = power_mode;
 #endif
-	SDE_EVT32(display->panel->power_mode, power_mode, rc);
-	DSI_DEBUG("Power mode transition from %d to %d %s",
-			display->panel->power_mode, power_mode,
-			rc ? "failed" : "successful");
-	if (!rc)
-		display->panel->power_mode = power_mode;
+	if (display->panel) {
+		SDE_EVT32(display->panel->power_mode, power_mode, rc);
+		DSI_DEBUG("Power mode transition from %d to %d %s",
+				display->panel->power_mode, power_mode,
+				rc ? "failed" : "successful");
+		if (!rc)
+			display->panel->power_mode = power_mode;
+	}
 
 	return rc;
 }
