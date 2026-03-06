@@ -1503,7 +1503,7 @@ static int fg_get_property(struct power_supply *psy, enum power_supply_property 
 #ifdef ENABLE_WAIT_SOC_FULL
 		if ((sm->p_report_soc < 100) && (val->intval > 99)) {
 			if ((abs((sm->batt_curr + sm->p_batt_current)/2) > (sm->top_off+sm->topoff_margin)) && (sm->is_charging)) {
-				val->intval = val->intval - WAIT_SOC_GAP;
+				//val->intval = val->intval - WAIT_SOC_GAP;
 				pr_info("soc wait for full chg - %d %d %d %d %d\n",sm->p_batt_current, sm->batt_curr, sm->top_off, sm->topoff_margin, sm->is_charging);
 			}
 		}
@@ -2118,10 +2118,10 @@ static int fg_recharge(struct sm_fg_chip *sm) {
 	bq25890_detect_charger_vbus_good_status(bq);
 	bq25890_detect_status(bq);
 	if ( bq->charger_status == 3 && (sm->batt_soc <= FG_RECHARGE_CAPACITY_limit) && bq->vbus_good_status && sm->batt_temp < 48 && (bq->charger_val == 1)) {
-		bq_recharge_flag = 1;
+		/*bq_recharge_flag = 1;
 		bq25890_charger_stop_charge(bq);
 		msleep(100);
-		bq25890_charger_start_charge(bq);
+		bq25890_charger_start_charge(bq);*/
 	}
 	pr_err("bq->charger_status:%d,sm->batt_soc:%d,bq->vbus_good_status:%d,sm->batt_temp:%d,bq->charger_val:%d\n",bq->charger_status,sm->batt_soc,bq->vbus_good_status,sm->batt_temp,bq->charger_val);
 	return 0;

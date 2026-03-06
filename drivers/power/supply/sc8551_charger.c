@@ -389,12 +389,17 @@ static int sc8551_check_charge_enabled(struct sc8551 *sc, bool *enable)
 
 	ret = sc8551_read_byte(sc, SC8551_REG_0C, &val);
 	if (!ret) {
+	/* Patch: Trust the enable bit in REG_0C primarily */
+		if (val & SC8551_CHG_EN_MASK) {
+			*enable = true;
+			return 0;
+		}
         ret = sc8551_read_byte(sc, SC8551_REG_0A, &val1);
         if (!ret) {
-            if ((val & SC8551_CHG_EN_MASK) && (val1 & SC8551_CONV_SWITCHING_STAT_MASK)) {
-                *enable = true;
-                return ret;
-            }
+		if (val1 & SC8551_CONV_SWITCHING_STAT_MASK) {
+				*enable = true;
+				return ret;
+		}
         }
     }
 	*enable = false;
@@ -1463,8 +1468,8 @@ static int sc8551_init_int_src(struct sc8551 *sc)
 
 static int sc8551_init_regulation(struct sc8551 *sc)
 {
-	sc8551_set_ibat_reg_th(sc, 300);
-	sc8551_set_vbat_reg_th(sc, 100);
+	sc8551_set_ibat_reg_th(sc, 500);
+	sc8551_set_vbat_reg_th(sc, 200);
 	sc8551_set_vdrop_deglitch(sc, 5000);
 	sc8551_set_vdrop_th(sc, 400);
 	sc8551_enable_regulation(sc, false);

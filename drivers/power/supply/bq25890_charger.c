@@ -818,6 +818,13 @@ static int bq25890_power_supply_set_property(struct power_supply *psy,
 			break;
 		case POWER_SUPPLY_PROP_INPUT_CURRENT_LIMIT:
 			ret = bq25890_field_write(bq, F_IILIM, (val->intval-100000) / 50000);
+			/* Patch: Force 3.25A (max) for all PD connections */
+			if (bq->pdactive) {
+				// (3250000uA - 100000) / 50000 = 63 (0x3F) which is max register value
+				ret = bq25890_field_write(bq, F_IILIM, 63);
+			} else {
+				ret = bq25890_field_write(bq, F_IILIM, (val->intval-100000) / 50000);
+			}
 			if (ret < 0) {
 				bq25890_field_write(bq, F_IILIM, (val->intval-100000) / 50000);
 				pr_err("[%s]line=%d: dbg_info 25890 set input current limit failed\n", __FUNCTION__, __LINE__);
@@ -1026,7 +1033,9 @@ static void bq25890_handle_state_change(struct bq25890_device *bq,
 		pr_err("--->southchip, adapter insert\n");
 		bq->detect_force_dpdm_count = 0;
 		if (bq->chip_id == SC8989X_ID || bq->chip_id == BQ25890_ID) {
-			bq25890_field_write(bq, F_IILIM, 0);
+			/* Patch: Don't set ICL to 0, start with at least 2A for PD handshake */
+			//bq25890_field_write(bq, F_IILIM, 0);
+			bq25890_field_write(bq, F_IILIM, 38); // 38 * 50 + 100 = 2000mA
 			msleep(100);
 			request_dpdm(bq,1); //close ap dp dm
 			pr_err("southchip force dpdm, 02\n");
@@ -1305,18 +1314,18 @@ extern int get_usbpd_verifed_state(void);
 int get_quick_charge_type(struct bq25890_device *bq)
 {
 	int i = 0;
-	int pd_auth = 0;
+	//int pd_auth = 0;
 
 	if (!bq)
 		return 0;
 
 	bq->real_type = get_usb_real_type(bq);
 	if(bq->real_type == POWER_SUPPLY_TYPE_USB_PD){
-		pd_auth = get_usbpd_verifed_state();
-		if(1 == pd_auth)
+		//pd_auth = get_usbpd_verifed_state();
+		//if(1 == pd_auth)
 			return QUICK_CHARGE_TURBE;
-		else
-			return QUICK_CHARGE_FAST;
+		//else
+			//return QUICK_CHARGE_FAST;
 	} else {
 		while (adapter_cap[i].adap_type != 0) {
 			if (bq->real_type == adapter_cap[i].adap_type) {

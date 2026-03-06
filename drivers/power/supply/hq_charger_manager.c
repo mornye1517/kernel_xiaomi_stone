@@ -765,7 +765,7 @@ static void sw_get_charger_type_current_limit(struct batt_chg *chg,int type)
 			chg->input_limit_cur = 1950000;
 			break;
         	case POWER_SUPPLY_TYPE_USB_PD:
-            	    if (chg->batt_auth) {
+            	    /*if (chg->batt_auth) {
                 	switch (fast_mode) {
                     	    case FAST_CHARGE_30W:
                                 chg->charge_limit_cur = 3000000; // 30W
@@ -782,7 +782,10 @@ static void sw_get_charger_type_current_limit(struct batt_chg *chg,int type)
             		} else {
                 	    chg->charge_limit_cur = 2000000;
             		}
-            		chg->input_limit_cur = 3000000;
+            		chg->input_limit_cur = 3000000;*/
+			/* Patch: Force 3.3A for PD chargers regardless of mode or auth */
+			chg->charge_limit_cur = 3300000;
+			chg->input_limit_cur = 3300000;
             		break;
 		case POWER_SUPPLY_TYPE_UNKNOWN:
 			chg->charge_limit_cur = 0;
@@ -794,7 +797,15 @@ static void sw_get_charger_type_current_limit(struct batt_chg *chg,int type)
 			break;
 	}
 
-	if (chg->pd_cur_max != 0) {
+	/*if (chg->pd_cur_max != 0) {
+		chg->charge_limit_cur = min(chg->charge_limit_cur, chg->pd_cur_max);
+		chg->input_limit_cur = min(chg->input_limit_cur, chg->pd_cur_max);
+	}*/
+	/* Patch: Bypass pd_cur_max bottleneck to allow full speed */
+	if (type == POWER_SUPPLY_TYPE_USB_PD) {
+		chg->charge_limit_cur = 3300000;
+		chg->input_limit_cur = 3300000;
+	} else if (chg->pd_cur_max != 0) {
 		chg->charge_limit_cur = min(chg->charge_limit_cur, chg->pd_cur_max);
 		chg->input_limit_cur = min(chg->input_limit_cur, chg->pd_cur_max);
 	}
@@ -805,7 +816,7 @@ static int swchg_select_charging_current_limit(struct batt_chg *chg, int temp, i
 	int icl,ibat;
 	union power_supply_propval val;
 	int rc = 0;
-	
+
 	sw_get_charger_type_current_limit(chg, type);
 	sw_battery_jeita(chg, temp);
 

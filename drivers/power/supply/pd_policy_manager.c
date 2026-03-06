@@ -554,9 +554,14 @@ static bool usbpd_get_pps_status(struct usbpd_pm *pdpm)
         *   apdo_cap.max_mv >= data->vcap_max &&
         *   apdo_cap.ma >= data->icap_min)
         */
+	/*
         if (apdo_cap.max_mv < pm_config.min_adapter_volt_required ||
             apdo_cap.ma < pm_config.min_adapter_curr_required)
             continue;
+	*/
+	/* Patch: Lower requirement to 1500mA to accept more PD chargers */
+	if (apdo_cap.max_mv < 5000 || apdo_cap.ma < 1500)
+	    continue;
         if (apdo_idx == -1) {
             apdo_idx = cap_idx;
             pdpm->apdo_max_volt = apdo_cap.max_mv;
@@ -635,7 +640,9 @@ static int pca_pps_tcp_notifier_call(struct notifier_block *nb,
             pdpm->psy_change_running = 0;
             break;
         case PD_CONNECT_PE_READY_SNK_PD30:
-            tcpm_dpm_pd_request(pdpm->tcpc, 5000, 3000, NULL);
+            //tcpm_dpm_pd_request(pdpm->tcpc, 5000, 3000, NULL);
+	    /* Patch: Request 9V/3.3A profile immediately if available */
+	    tcpm_dpm_pd_request(pdpm->tcpc, 9000, 3300, NULL);
             break;
         case PD_CONNECT_PE_READY_SNK_APDO:
             if (pdpm->hrst_cnt < 5) {
@@ -868,8 +875,10 @@ static int battery_sw_jeita(struct usbpd_pm *pdpm)
         else
             jeita_curr  = CHG_BAT_CURR_2450MA;
 
-        if (pdpm->batt_auth != 1)
+        /*if (pdpm->batt_auth != 1)
             jeita_curr = 2000;
+	*/
+	jeita_curr = 3300;
 
         if(pdpm->therm_curr < 2000)
             pdpm->pps_temp_flag = 0;
@@ -935,7 +944,8 @@ static int usbpd_pm_fc2_charge_algo(struct usbpd_pm *pdpm)
     * bat_limit = min(pm_config.bat_curr_lp_lmt, fcc_curr);
     */
     fcc_curr = battery_sw_jeita(pdpm);
-    ibat_limit = min(pm_config.bat_curr_lp_lmt, fcc_curr) - 100;
+    //ibat_limit = min(pm_config.bat_curr_lp_lmt, fcc_curr) - 100;
+    ibat_limit = 3300;
     if (pdpm->input_suspend == 1 || pdpm->is_stop_charge == 1)
         ibat_limit = 0;
  //   ibat_limit = pm_config.bat_curr_lp_lmt;

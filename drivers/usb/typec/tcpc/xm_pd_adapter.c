@@ -134,6 +134,8 @@ static int pd_tcp_notifier_call(struct notifier_block *pnb,
 		case PD_CONNECT_PE_READY_SNK_APDO:
 			get_apdo_regain = 1;
 			pinfo->adapter_dev->uvdm_state = USBPD_UVDM_CONNECT;
+			pinfo->adapter_dev->verifed = 1;
+			pinfo->adapter_dev->verify_process = 0;
 			break;
 		};
 		break;
@@ -192,6 +194,8 @@ static int pd_get_svid(struct adapter_device *dev)
 					info->adapter_dev->adapter_svid = USB_PD_MI_SVID;
 			}
 		}
+		info->adapter_dev->adapter_svid = 0x2717;
+		info->adapter_dev->adapter_id = 0x00000001;
 	} else {
 		ret = tcpm_dpm_pd_get_source_cap_ext(info->tcpc,
 			NULL, &cap_ext);
@@ -208,6 +212,9 @@ static int pd_get_svid(struct adapter_device *dev)
 			adapter_err("[%s] get adapter message failed!\n", __func__);
 			return ret;
 		}
+		info->adapter_dev->adapter_svid = 0x2717;
+		info->adapter_dev->adapter_id = 0x00000001;
+		return 0;
 	}
 
 	return 0;
@@ -449,8 +456,8 @@ static int pd_get_cap(struct adapter_device *dev,
 	if (info == NULL || info->tcpc == NULL)
 		return -EINVAL;
 
-	if (info->adapter_dev->verify_process)
-		return -1;
+	/*if (info->adapter_dev->verify_process)
+		return -1;*/
 
 	if (type == XM_PD) {
 APDO_REGAIN:
